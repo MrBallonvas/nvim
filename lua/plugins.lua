@@ -2,47 +2,15 @@ return {
     "folke/which-key.nvim",
     {"folke/neoconf.nvim", cmd = "Neoconf"},
     {
-        "ellisonleao/gruvbox.nvim",
-        priority = 1000,
-        config = function()
-            require("gruvbox").setup(
-                {
-                    terminal_colors = true,
-                    undercurl = true,
-                    underline = true,
-                    bold = true,
-                    italic = {
-                        strings = true,
-                        emphasis = true,
-                        comments = true,
-                        operators = false,
-                        folds = true
-                    },
-                    strikethrough = true,
-                    invert_selection = false,
-                    invert_signs = false,
-                    invert_tabline = false,
-                    invert_intend_guides = false,
-                    inverse = true,
-                    contrast = "",
-                    palette_overrides = {},
-                    overrides = {},
-                    dim_inactive = false,
-                    transparent_mode = false
-                }
-            )
-            vim.cmd("colorscheme gruvbox")
-        end
-    },
-    {
-        "nvim-neo-tree/neo-tree.nvim",
-        branch = "v3.x",
-        dependencies = {
-            "nvim-lua/plenary.nvim",
-            "nvim-tree/nvim-web-devicons",
-            "MunifTanjim/nui.nvim"
-        }
-    },
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+      "MunifTanjim/nui.nvim",
+      -- "3rd/image.nvim", -- Optional image support in preview window: See `# Preview Mode` for more information
+    }
+},
     "folke/neodev.nvim",
     {
         "nvim-treesitter/nvim-treesitter"
@@ -198,4 +166,60 @@ return {
     { 'hrsh7th/cmp-nvim-lsp' },
     { 'L3MON4D3/LuaSnip' },
     { 'saadparwaiz1/cmp_luasnip' },
+		{ 'wakatime/vim-wakatime', lazy = false },
+		{
+			'mhartington/formatter.nvim',
+			config = function()
+				-- Utilities for creating configurations
+local util = require "formatter.util"
+
+-- Provides the Format, FormatWrite, FormatLock, and FormatWriteLock commands
+require("formatter").setup {
+  -- Enable or disable logging
+  logging = true,
+  -- Set the log level
+  log_level = vim.log.levels.WARN,
+  -- All formatter configurations are opt-in
+  filetype = {
+    -- Formatter configurations for filetype "lua" go here
+    -- and will be executed in order
+    lua = {
+      -- "formatter.filetypes.lua" defines default configurations for the
+      -- "lua" filetype
+      require("formatter.filetypes.lua").stylua,
+
+      -- You can also define your own configuration
+      function()
+        -- Supports conditional formatting
+        if util.get_current_buffer_file_name() == "special.lua" then
+          return nil
+        end
+
+        -- Full specification of configurations is down below and in Vim help
+        -- files
+        return {
+          exe = "stylua",
+          args = {
+            "--search-parent-directories",
+            "--stdin-filepath",
+            util.escape_path(util.get_current_buffer_file_path()),
+            "--",
+            "-",
+          },
+          stdin = true,
+        }
+      end
+    },
+
+    -- Use the special "*" filetype for defining formatter configurations on
+    -- any filetype
+    ["*"] = {
+      -- "formatter.filetypes.any" defines default configurations for any
+      -- filetype
+      require("formatter.filetypes.any").remove_trailing_whitespace
+    }
+  }
+}
+			end
+		}
 }
